@@ -1,0 +1,24 @@
+.hidden {
+  display: none;
+}
+
+label {
+  margin-bottom: 10px;
+  display: block;
+}
+
+pre {  
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #343f5f;
+  color: #fdfeff;
+  overflow: scroll;
+  border: 1px #929090 solid;
+  padding: 5px;
+  margin-top: 0px;
+}
+
+select {  
+  width: 100%;
+  padding: 5px;
+}
