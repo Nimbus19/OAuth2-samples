@@ -1,35 +1,35 @@
 export const Logger = () => {
-    var _select;// HTMLSelectElement
-    var _texPanel;// HTMLPreElement
-    var _logDetail = [];
+    var select;
+    var textPanel;
+    var logHistory = [];
 
-    const init = (selst, pre) => {
-        _select = selst;    
-        _texPanel = pre;
-        _select.onchange = onSelect;
+    const init = (HTMLSelectElement, HTMLPreElement) => {
+        select = HTMLSelectElement;    
+        textPanel = HTMLPreElement;
+        select.onchange = onSelect;
     }
 
-    const add = (logText, logDetailText = "") => {
-        // Update log list    
+    const add = (logTitle, logText = "") => {
+        // Update list of log title
         var option = document.createElement('option');
-        option.value = _logDetail.length;
-        option.text = `${getTimestamp()} ${logText}`;
+        option.value = logHistory.length;
+        option.text = `${getTimestamp()} ${logTitle}`;
     
-        _select.add(option);
-        _select.value = _logDetail.length;
+        select.add(option);
+        select.value = logHistory.length;
     
-        // Update log detail
-        var logDetailwithTitle = `${option.text}\n\n${logDetailText}`;
-        _texPanel.textContent = logDetailwithTitle;
-        _logDetail.push(logDetailwithTitle);
+        // Update log text to panel
+        var logTextwithTitle = `${option.text}\n\n${logText}`;
+        textPanel.textContent = logTextwithTitle;
+        logHistory.push(logTextwithTitle);
     }
 
     const clear = () => {
-        while (_select.firstChild) {
-            _select.removeChild(_select.lastChild);
+        while (select.firstChild) {
+            select.removeChild(select.lastChild);
         }
-        _texPanel.textContent = "";
-        _logDetail = [];
+        textPanel.textContent = "";
+        logHistory = [];
     }
 
     const getTimestamp = () => {
@@ -39,8 +39,8 @@ export const Logger = () => {
     }
 
     const onSelect = () => {
-        var index = parseInt(_select.value);
-        _texPanel.textContent = _logDetail[index];
+        var index = parseInt(select.value);
+        textPanel.textContent = logHistory[index];
     }
 
     return {

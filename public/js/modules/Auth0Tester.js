@@ -1,73 +1,76 @@
 export const Auth0Tester = () => {
-    var _auth0;// The _auth0 client
-    var _accessToken;
-    var _testArea;// HTMLDivElement
-    var _logger;// modules/_logger    
+    var testArea;
+    var logger;
+    var auth0Client;
+    var accessToken;      
 
-    const init = async (logger, div) => {
-        _testArea = div;
-        _logger = logger;       
+    const init = async (Logger, HTMLDivElement) => {
+        testArea = HTMLDivElement;
+        logger = Logger;       
 
+        addButtonsToTestArea();
+
+        await initauth0Client();
+        if (auth0Client) {
+            await checkAuthentication();
+        }
+    }
+
+    const addButtonsToTestArea = () => {
+        const createButton = (btnName, callback) => {
+            var btn = document.createElement("button");
+            btn.innerHTML = btnName;
+            btn.onclick = callback;
+            testArea.appendChild(btn);
+        }
         createButton("Login", login);
         createButton("Get Token", getToken);
         createButton("Call API", callAPI);
         createButton("Logout", logout);
         var br = document.createElement("br");
-        _testArea.appendChild(br);
-
-        await initauth0Client();
-        if (_auth0) {
-            await checkAuthentication();
-        }
-    }
-
-    const createButton = (btnName, callback) => {
-        var btn = document.createElement("button");
-        btn.innerHTML = btnName;
-        btn.onclick = callback;
-        _testArea.appendChild(btn);
+        testArea.appendChild(br);
     }
 
     const initauth0Client = async () => {
         const response = await fetch("../auth_config.json");
         const config = await response.json();
 
-        if (!_auth0) {
+        if (!auth0Client) {
             try {
-                _auth0 = await createAuth0Client({
+                auth0Client = await createAuth0Client({
                     domain: config.domain,
                     client_id: config.clientId,
                     audience: config.audience,
                     cacheLocation: "localstorage",
                     useRefreshTokens: true
                 });
-                _logger.add("Auth0 client created.");
+                logger.add("Auth0 client created.");
             } catch (err) {
-                _logger.add("Error create Auth0 client.", err);
+                logger.add("Error create Auth0 client.", err);
             }
         }
     }
 
     const checkAuthentication = async () => {
-        const isAuthenticated = await _auth0.isAuthenticated();
+        const isAuthenticated = await auth0Client.isAuthenticated();
 
         if (isAuthenticated) {
-            _logger.add("User is authenticated.");
+            logger.add("User is authenticated.");
             window.history.replaceState({}, document.title, window.location.pathname);
         }
         else {
-            _logger.add("User not authenticated.");
+            logger.add("User not authenticated.");
 
             const query = window.location.search;
             const shouldParseResult = query.includes("code=") && query.includes("state=");
 
             if (shouldParseResult) {
-                _logger.add("Found auth code in URI.", query);
+                logger.add("Found auth code in URI.", query);
                 try {
-                    const result = await _auth0.handleRedirectCallback();
-                    _logger.add("Parse auth code.");
+                    const result = await auth0Client.handleRedirectCallback();
+                    logger.add("Parse auth code.");
                 } catch (err) {
-                    _logger.add("Error parsing redirect.", err);
+                    logger.add("Error parsing redirect.", err);
                 }
                 window.history.replaceState({}, document.title, "/");
             }
@@ -76,27 +79,27 @@ export const Auth0Tester = () => {
 
     const login = async () => {
         try {
-            _logger.add("Logging in");
+            logger.add("Logging in");
 
             const options = {
                 redirect_uri: window.location.origin
             };
 
-            await _auth0.loginWithRedirect(options);
-            //await _auth0.loginWithPopup();
+            await auth0Client.loginWithRedirect(options);
+            //await auth0Client.loginWithPopup();
         } catch (err) {
-            _logger.add("Log in failed", err);
+            logger.add("Log in failed", err);
         }
     };
 
     const logout = () => {
         try {
-            _logger.add("Logging out");
-            _auth0.logout({
+            logger.add("Logging out");
+            auth0Client.logout({
                 returnTo: window.location.origin
             });
         } catch (err) {
-            _logger.add("Log out failed", err);
+            logger.add("Log out failed", err);
         }
     };
 
@@ -107,10 +110,10 @@ export const Auth0Tester = () => {
         }
 
         try {
-            _accessToken = await _auth0.getTokenSilently(option);
-            _logger.add("Get access token.", _accessToken);
+            accessToken = await auth0Client.getTokenSilently(option);
+            logger.add("Get access token.", accessToken);
         } catch (err) {
-            _logger.add("Get access token failed.", err);
+            logger.add("Get access token failed.", err);
         }
     };
 
@@ -119,17 +122,17 @@ export const Auth0Tester = () => {
             method: 'GET',
             mode: 'no-cors',
             headers: {
-                Authorization: `Bearer ${_accessToken}`
+                Authorization: `Bearer ${accessToken}`
             }
         });
 
         var status = result.status;
         var response = await result.text();
         if (status < 400) {
-            _logger.add("Call API with token.", response);
+            logger.add("Call API with token.", response);
         }
         else {
-            _logger.add("Call API with token failed.", response);
+            logger.add("Call API with token failed.", response);
         }
     }
 

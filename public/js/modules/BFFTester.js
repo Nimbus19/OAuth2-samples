@@ -1,32 +1,47 @@
 export const BFFTester = () => {
-    var _testArea;// HTMLDivElement
-    var _logger;// modules/_logger
-    var apiData;
-    var isBFFLogin;
+    var testArea;
+    var logger;
+    var csrfToken = "";
+    var authRequestUrl = "";
+    var authCodeUrl = "";
 
-    const init = async (logger, div) => {
-        _testArea = div;
-        _logger = logger;
+    const init = async (Logger, HTMLDivElement) => {
+        testArea = HTMLDivElement;
+        logger = Logger;       
+
+        addButtonsToTestArea();
+        checkAuthCode();
+    }
+
+    const addButtonsToTestArea = () => {
+        const createButton = (btnName, callback) => {
+            var btn = document.createElement("button");
+            btn.innerHTML = btnName;
+            btn.onclick = callback;
+            testArea.appendChild(btn);
+        }
 
         createButton("Login BFF", bffLogin);
-        createButton("Process redirct", redirect);
         createButton("Get token", bffGetToken);
         createButton("Get user info.", bffUserInfo);
         createButton("Refresh token", bffRefresh);
         createButton("Logout", bffLogout);
         var br = document.createElement("br");
-        _testArea.appendChild(br);
+        testArea.appendChild(br);
         createButton("Test closure", testClosure);
         createButton("Test WebCrypto", testWebCrypto);
         br = document.createElement("br");
-        _testArea.appendChild(br);
-    }
+        testArea.appendChild(br);
+    }    
 
-    const createButton = (btnName, callback) => {
-        var btn = document.createElement("button");
-        btn.innerHTML = btnName;
-        btn.onclick = callback;
-        _testArea.appendChild(btn);
+    const checkAuthCode = () => {
+        const query = window.location.search;
+        const shouldParseResult = query.includes("code=") && query.includes("state=");
+
+        if (shouldParseResult) {
+            logger.add("Get auth code.", query);
+            authCodeUrl = window.location.href;
+        }
     }
 
     const bffLogin = async () => {
@@ -34,18 +49,22 @@ export const BFFTester = () => {
             method: 'POST',
             credentials: "include"
         });
-        apiData.status = result.status;
-        apiData.response = await result.json();
-        isBFFLogin = true;
-    }
+        var status = result.status;
+        var response = await result.json();
+        authRequestUrl = response.authorizationRequestUrl;
 
-    const redirect = async () => {
-        if (apiData.status === 200) {
-            window.location.replace(apiData.response.authorizationRequestUrl);
+        if (authRequestUrl) {
+            window.location.replace(authRequestUrl);
         }
+
+        logger.add("BFF login.",
+            status + "\n\n" + 
+            JSON.stringify(response, null, 2));
     }
 
     const bffGetToken = async () => {
+        window.history.replaceState({}, document.title, "/");
+
         const result = await fetch('http://localhost:3020/bff/login/end', {
             method: 'POST',
             credentials: "include",
@@ -53,11 +72,15 @@ export const BFFTester = () => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                pageUrl: window.location.href
+                pageUrl: authCodeUrl
             })
         });
-        apiData.status = result.status;
-        apiData.response = await result.json();
+        var status = result.status;
+        var response = await result.json();
+        csrfToken = response.csrf;
+        logger.add("Get token.",
+            status + "\n\n" + 
+            JSON.stringify(response, null, 2));
     }
 
     const bffUserInfo = async () => {
@@ -65,8 +88,11 @@ export const BFFTester = () => {
             method: 'GET',
             credentials: "include",
         });
-        apiData.status = result.status;
-        apiData.response = await result.json();
+        var status = result.status;
+        var response = await result.json();
+        logger.add("Get user.",
+            status + "\n\n" + 
+            JSON.stringify(response, null, 2));
     }
 
     const bffRefresh = async () => {
@@ -74,11 +100,11 @@ export const BFFTester = () => {
             method: 'POST',
             credentials: "include",
             headers: {
-                "x-bff-csrf": apiData.response.csrf
+                "x-bff-csrf": csrfToken
             }
         });
-        apiData.status = result.status;
-        apiData.response = await result.json();
+        var status = result.status;
+        logger.add("Refresh token.", status + "\n\n");
     }
 
     const bffLogout = async () => {
@@ -86,12 +112,15 @@ export const BFFTester = () => {
             method: 'POST',
             credentials: "include",
             headers: {
-                "x-bff-csrf": apiData.response.csrf
+                "x-bff-csrf": csrfToken
             }
         });
-        apiData.status = result.status;
-        apiData.response = await result.json();
+        var status = result.status;
+        var response = await result.json();
         window.history.replaceState({}, document.title, "/");
+        logger.add("Logout.",
+            status + "\n\n" + 
+            JSON.stringify(response, null, 2));
     }
 
     const testClosure = () => {
