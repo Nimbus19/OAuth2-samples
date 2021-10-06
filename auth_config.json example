@@ -1,5 +1,12 @@
 {
-  "domain": "dev-xxxxxxxx.us.auth0.com",
-  "clientId": "xxxxxxx",
-  "audience": "xxxxxxx"
+  "auth0":
+  {
+    "domain": "dev-xxxx.us.auth0.com",
+    "clientId": "xxxxxxx",
+    "audience": "http://localhost:3010"
+  },
+  "google":
+  {
+    "client_id": "xxxxxxx.apps.googleusercontent.com"
+  }
 }

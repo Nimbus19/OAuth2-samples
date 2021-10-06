@@ -45,7 +45,7 @@ export const BFFTester = () => {
     }
 
     const bffLogin = async () => {
-        const result = await fetch('http://localhost:3020/bff/login/start', {
+        const result = await fetch('http://localhost:3001/bff/login/start', {
             method: 'POST',
             credentials: "include"
         });
@@ -65,7 +65,7 @@ export const BFFTester = () => {
     const bffGetToken = async () => {
         window.history.replaceState({}, document.title, "/");
 
-        const result = await fetch('http://localhost:3020/bff/login/end', {
+        const result = await fetch('http://localhost:3001/bff/login/end', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -84,7 +84,7 @@ export const BFFTester = () => {
     }
 
     const bffUserInfo = async () => {
-        const result = await fetch('http://localhost:3020/bff/userInfo', {
+        const result = await fetch('http://localhost:3001/bff/userInfo', {
             method: 'GET',
             credentials: "include",
         });
@@ -96,7 +96,7 @@ export const BFFTester = () => {
     }
 
     const bffRefresh = async () => {
-        const result = await fetch('http://localhost:3020/bff/refresh', {
+        const result = await fetch('http://localhost:3001/bff/refresh', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -108,7 +108,7 @@ export const BFFTester = () => {
     }
 
     const bffLogout = async () => {
-        const result = await fetch('http://localhost:3020/bff/logout', {
+        const result = await fetch('http://localhost:3001/bff/logout', {
             method: 'POST',
             credentials: "include",
             headers: {

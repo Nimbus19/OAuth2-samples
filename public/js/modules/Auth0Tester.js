@@ -33,7 +33,7 @@ export const Auth0Tester = () => {
 
     const initauth0Client = async () => {
         const response = await fetch("../auth_config.json");
-        const config = await response.json();
+        const config = (await response.json()).auth0;
 
         if (!auth0Client) {
             try {
