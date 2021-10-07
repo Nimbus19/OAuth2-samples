@@ -1,4 +1,3 @@
-import { Logger } from './Logger.js'
 export const GoogleTester = () => {
     var testArea;
     var logger;
@@ -28,7 +27,6 @@ export const GoogleTester = () => {
         input.id = "client_secret";
         input.placeholder = "Client secret";
         testArea.appendChild(input);
-
         testArea.appendChild(document.createElement("br"));
 
         const createButton = (btnName, callback) => {
@@ -55,7 +53,7 @@ export const GoogleTester = () => {
         }
     }
 
-    const authGrant = async () => {
+    const authGrant = () => {
         var authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" + 
         `client_id=${config.client_id}&` + 
         `scope=openid profile email&` + 
@@ -89,14 +87,20 @@ export const GoogleTester = () => {
         };
 
         fetch("https://oauth2.googleapis.com/token", requestOptions)
-        .then(response => response.json())
-        .then(result => {
-            logger.add("Get token.",JSON.stringify(result, null, 2));
-            idToken = result.id_token;
-            accessToken = result.access_token;
-            refreshToken = result.refresh_token;
-        })
-        .catch(error => logger.add("Get token error.",error));
+        .then(async response => {
+            if(response.ok) {
+                const result = await response.json();
+                logger.add("Get token.", `HTTP ${response.status}\n${JSON.stringify(result, null, 2)}`);
+                idToken = result.id_token;
+                accessToken = result.access_token;
+                refreshToken = result.refresh_token;
+            }
+            else {
+                const result = await response.text();
+                throw new Error(`HTTP ${response.status}\n${result}`);
+            }
+        })        
+        .catch(error => logger.add("Get token error.", error, "red"));
     }
 
     const getSecret = () => {
@@ -105,14 +109,32 @@ export const GoogleTester = () => {
 
     const getTokenInfo = async () => {   
         fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`, {method: 'GET'})
-        .then(response => response.text())
-        .then(result => logger.add("Get ID token info.",result))
-        .catch(error => logger.add("Get ID token info error.",error));
+        .then(async response => {
+            const result = await response.text();
+            const log = `HTTP ${response.status}\n${result}`;
+
+            if(response.ok) {
+                logger.add("Get ID token info.", log);
+            }
+            else {
+                throw new Error(log);
+            }
+        })
+        .catch(error => logger.add("Get ID token info error.", error, "red"));
 
         fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${accessToken}`, {method: 'GET'})
-        .then(response => response.text())
-        .then(result => logger.add("Get access token info.",result))
-        .catch(error => logger.add("Get access token info error.",error));        
+        .then(async response => {
+            const result = await response.text();
+            const log = `HTTP ${response.status}\n${result}`;
+
+            if(response.ok) {                
+                logger.add("Get access token info.", log);
+            }
+            else {
+                throw new Error(log);
+            }
+        })
+        .catch(error => logger.add("Get access token info error.", error, "red"));        
     }
 
     const getNewToken = async () => {
@@ -133,13 +155,19 @@ export const GoogleTester = () => {
         };
 
         fetch("https://oauth2.googleapis.com/token", requestOptions)
-        .then(response => response.json())
-        .then(result => {
-            logger.add("Get new tokens.",JSON.stringify(result, null, 2));
-            idToken = result.id_token;
-            accessToken = result.access_token;
+        .then(async response => {
+            if(response.ok) {
+                const result = await response.json();
+                logger.add("Get new tokens.", `HTTP ${response.status}\n${JSON.stringify(result, null, 2)}`);
+                idToken = result.id_token;
+                accessToken = result.access_token;
+            }
+            else {
+                const result = await response.text();
+                throw new Error(`HTTP ${response.status}\n${result}`);
+            }
         })
-        .catch(error => logger.add("Get token error.",error));
+        .catch(error => logger.add("Get new token error.", error, "red"));
     }
 
     const revokeToken = async () => {
@@ -157,8 +185,19 @@ export const GoogleTester = () => {
         };
 
         fetch("https://oauth2.googleapis.com/revoke", requestOptions)
-        .then(response => logger.add("Revoke tokens.",response.status))
-        .catch(error => logger.add("Revoke token error.",error));
+        .then(async response => {
+            const result = await response.text();
+            const log = `HTTP ${response.status}\n${result}`;
+            
+            if(response.ok) {
+                logger.add("Revoke tokens.", log);
+            }
+            else {
+                const result = await response.text();
+                throw new Error(log);
+            }
+        })
+        .catch(error => logger.add("Revoke token error.", error, "red"));
     }
 
     return {

@@ -9,11 +9,12 @@ export const Logger = () => {
         select.onchange = onSelect;
     }
 
-    const add = (logTitle, logText = "") => {
+    const add = (logTitle, logText = "", color = "black") => {
         // Update list of log title
         var option = document.createElement('option');
         option.value = logHistory.length;
         option.text = `${getTimestamp()} ${logTitle}`;
+        option.style.color = color;
     
         select.add(option);
         select.value = logHistory.length;
