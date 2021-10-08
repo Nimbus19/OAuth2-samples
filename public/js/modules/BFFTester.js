@@ -14,6 +14,11 @@ export const BFFTester = () => {
     }
 
     const addButtonsToTestArea = () => {
+        var lable = document.createElement("lable");
+        lable.innerHTML = "BFF Tester"
+        testArea.appendChild(lable);
+        testArea.appendChild(document.createElement("br"));
+
         const createButton = (btnName, callback) => {
             var btn = document.createElement("button");
             btn.innerHTML = btnName;

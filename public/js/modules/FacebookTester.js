@@ -1,31 +1,30 @@
 import {StringUtility} from './StringUtility.js'
 
-export const GoogleTester = () => {
+export const FacebookTester = () => {
     var testArea;
     var logger;
     var config;
-    var idToken;
     var accessToken;
-    var refreshToken;
+    var userID;
 
     const init = async (Logger, HTMLDivElement) => {
         testArea = HTMLDivElement;
         logger = Logger;
         var response = await fetch("../auth_config.json");
-        config = (await response.json()).google;
+        config = (await response.json()).facebook;
 
         addButtonsToTestArea();
     }
 
     const addButtonsToTestArea = () => {
         var lable = document.createElement("lable");
-        lable.innerHTML = "Google Tester"
+        lable.innerHTML = "Facebook Tester"
         testArea.appendChild(lable);
         testArea.appendChild(document.createElement("br"));
 
         var input = document.createElement("input");
         input.type = "password";
-        input.name = "google";
+        input.name = "facebook"
         input.id = "client_secret";
         input.placeholder = "Client secret";
         testArea.appendChild(input);
@@ -58,13 +57,12 @@ export const GoogleTester = () => {
         var codeChallenge = await StringUtility().sha256(codeVerifier);
         codeChallenge = StringUtility().base64urlencode(codeChallenge);
 
-        var authUrl = "https://accounts.google.com/o/oauth2/v2/auth" + 
+        var authUrl = "https://www.facebook.com/v12.0/dialog/oauth" + 
         `?client_id=${config.client_id}` + 
         `&state=${state}` + 
-        `&scope=openid profile email` + 
+        `&scope=public_profile email` + 
         `&response_type=code` + 
         `&redirect_uri=http://localhost:3000/` +
-        `&access_type=offline` +
         `&code_challenge_method=S256` + 
         `&code_challenge=${codeChallenge}`;
 
@@ -119,14 +117,12 @@ export const GoogleTester = () => {
             body: urlencoded
         };
 
-        fetch("https://oauth2.googleapis.com/token", requestOptions)
+        fetch("https://graph.facebook.com/v12.0/oauth/access_token", requestOptions)
         .then(async response => {
             if(response.ok) {
                 const result = await response.json();
                 logger.add("Get token.", `HTTP ${response.status}\n${JSON.stringify(result, null, 2)}`);
-                idToken = result.id_token;
                 accessToken = result.access_token;
-                refreshToken = result.refresh_token;
             }
             else {
                 const result = await response.text();
@@ -140,34 +136,29 @@ export const GoogleTester = () => {
         return document.getElementById("client_secret").value;
     }
 
-    const getTokenInfo = async () => {   
-        fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`, {method: 'GET'})
+    const getTokenInfo = async () => {
+        var myHeaders = new Headers();
+        myHeaders.append('Authorization','Bearer ' + accessToken);
+
+        var requestOptions = {
+            method: 'GET',
+            headers: myHeaders
+        };
+
+        fetch(`https://graph.facebook.com/debug_token?input_token=${accessToken}`, requestOptions)
         .then(async response => {
-            const result = await response.text();
-            const log = `HTTP ${response.status}\n${result}`;
+            const result = await response.json();
+            const log = `HTTP ${response.status}\n${JSON.stringify(result, null, 2)}}`;
 
             if(response.ok) {
-                logger.add("Get ID token info.", log);
-            }
-            else {
-                throw new Error(log);
-            }
-        })
-        .catch(error => logger.add("Get ID token info error.", error, "red"));
-
-        fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${accessToken}`, {method: 'GET'})
-        .then(async response => {
-            const result = await response.text();
-            const log = `HTTP ${response.status}\n${result}`;
-
-            if(response.ok) {                
                 logger.add("Get access token info.", log);
+                userID = result.data.user_id;
             }
             else {
                 throw new Error(log);
             }
         })
-        .catch(error => logger.add("Get access token info error.", error, "red"));        
+        .catch(error => logger.add("Get ID token info error.", error, "red"));  
     }
 
     const getNewToken = async () => {
@@ -177,8 +168,8 @@ export const GoogleTester = () => {
         var urlencoded = new URLSearchParams();
         urlencoded.append("client_id", config.client_id);
         urlencoded.append("client_secret", getSecret());
-        urlencoded.append("grant_type","refresh_token");
-        urlencoded.append("refresh_token",refreshToken);
+        urlencoded.append("grant_type", "fb_exchange_token");
+        urlencoded.append("fb_exchange_token", accessToken);
         urlencoded.append("redirect_uri", "http://localhost:3000");
 
         var requestOptions = {
@@ -187,12 +178,11 @@ export const GoogleTester = () => {
             body: urlencoded
         };
 
-        fetch("https://oauth2.googleapis.com/token", requestOptions)
+        fetch("https://graph.facebook.com/v12.0/oauth/access_token", requestOptions)
         .then(async response => {
             if(response.ok) {
                 const result = await response.json();
                 logger.add("Get new tokens.", `HTTP ${response.status}\n${JSON.stringify(result, null, 2)}`);
-                idToken = result.id_token;
                 accessToken = result.access_token;
             }
             else {
@@ -206,18 +196,14 @@ export const GoogleTester = () => {
     const revokeToken = async () => {
         var myHeaders = new Headers();
         myHeaders.append("content-type", "application/x-www-form-urlencoded");
-
-        var urlencoded = new URLSearchParams();
-        urlencoded.append("client_id", config.client_id);
-        urlencoded.append("token",refreshToken);
+        myHeaders.append('Authorization','Bearer ' + accessToken);
 
         var requestOptions = {
-            method: 'POST',
+            method: 'DELETE',
             headers: myHeaders,
-            body: urlencoded
         };
 
-        fetch("https://oauth2.googleapis.com/revoke", requestOptions)
+        fetch(`https://graph.facebook.com/v12.0/${userID}/permissions`, requestOptions)
         .then(async response => {
             const result = await response.text();
             const log = `HTTP ${response.status}\n${result}`;

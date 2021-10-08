@@ -8,5 +8,9 @@
   "google":
   {
     "client_id": "xxxxxxx.apps.googleusercontent.com"
+  },
+    "facebook":
+  {
+    "client_id": "xxxxxxx"
   }
 }
