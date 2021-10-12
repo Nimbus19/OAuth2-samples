@@ -1,4 +1,4 @@
-import {StringUtility} from './StringUtility.js'
+import {StringUtility} from '../StringUtility.js'
 
 export const GoogleTester = () => {
     var testArea;

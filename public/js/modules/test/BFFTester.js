@@ -31,12 +31,6 @@ export const BFFTester = () => {
         createButton("Get user info.", bffUserInfo);
         createButton("Refresh token", bffRefresh);
         createButton("Logout", bffLogout);
-        var br = document.createElement("br");
-        testArea.appendChild(br);
-        createButton("Test closure", testClosure);
-        createButton("Test WebCrypto", testWebCrypto);
-        br = document.createElement("br");
-        testArea.appendChild(br);
     }    
 
     const checkAuthCode = () => {
@@ -126,56 +120,7 @@ export const BFFTester = () => {
         logger.add("Logout.",
             status + "\n\n" + 
             JSON.stringify(response, null, 2));
-    }
-
-    const testClosure = () => {
-        function oauth() {
-            // private member
-            var accessToken = "";
-            var refresToken = "";
-
-            function runAuthFlow() {
-                accessToken = "AT1";
-                refresToken = "RT1";
-            }
-
-            // public member
-            return {
-                init: function () {
-                    runAuthFlow();
-                },
-                getAT: function () {
-                    return accessToken;
-                }
-            };
-        };
-
-        const client = oauth();
-        client.init();
-        client.getAT();// "AT1"
-        client.accessToken;// undefined
-        client.refresToken;// undefined
-    }
-
-    const testWebCrypto = () => {
-        window.crypto.subtle.generateKey(
-            {
-                name: "ECDSA",
-                namedCurve: "P-256", // the curve name
-            },
-            true, // <== Here if you want it to be exportable !!
-            ["sign", "verify"] // usage
-        )
-            .then(function (key) {
-                //returns a keypair object
-                console.log(key);
-                console.log(key.publicKey);
-                console.log(key.privateKey);
-            })
-            .catch(function (err) {
-                console.error(err);
-            });
-    }
+    }    
 
     return {
         init: init

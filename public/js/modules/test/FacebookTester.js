@@ -1,11 +1,10 @@
-import {StringUtility} from './StringUtility.js'
+import {StringUtility} from '../StringUtility.js'
 
 export const FacebookTester = () => {
     var testArea;
     var logger;
     var config;
     var accessToken;
-    var userID;
 
     const init = async (Logger, HTMLDivElement) => {
         testArea = HTMLDivElement;
@@ -105,7 +104,6 @@ export const FacebookTester = () => {
 
         var urlencoded = new URLSearchParams();
         urlencoded.append("client_id", config.client_id);
-        urlencoded.append("client_secret", getSecret());
         urlencoded.append("grant_type","authorization_code");
         urlencoded.append("code", query.get("code"));
         urlencoded.append("code_verifier", localStorage.getItem("pkce_code_verifier"));
@@ -147,18 +145,31 @@ export const FacebookTester = () => {
 
         fetch(`https://graph.facebook.com/debug_token?input_token=${accessToken}`, requestOptions)
         .then(async response => {
-            const result = await response.json();
-            const log = `HTTP ${response.status}\n${JSON.stringify(result, null, 2)}}`;
+            const result = await response.text();
+            const log = `HTTP ${response.status}\n${result}}`;
 
             if(response.ok) {
                 logger.add("Get access token info.", log);
-                userID = result.data.user_id;
             }
             else {
                 throw new Error(log);
             }
         })
-        .catch(error => logger.add("Get ID token info error.", error, "red"));  
+        .catch(error => logger.add("Get access token info error.", error, "red"));
+
+        fetch(`https://graph.facebook.com/v12.0/me/permissions`, requestOptions)
+        .then(async response => {
+            const result = await response.text();
+            const log = `HTTP ${response.status}\n${result}}`;
+
+            if(response.ok) {
+                logger.add("Get access token scope.", log);
+            }
+            else {
+                throw new Error(log);
+            }
+        })
+        .catch(error => logger.add("Get access token scope error.", error, "red"));  
     }
 
     const getNewToken = async () => {
@@ -195,7 +206,6 @@ export const FacebookTester = () => {
 
     const revokeToken = async () => {
         var myHeaders = new Headers();
-        myHeaders.append("content-type", "application/x-www-form-urlencoded");
         myHeaders.append('Authorization','Bearer ' + accessToken);
 
         var requestOptions = {
@@ -203,7 +213,7 @@ export const FacebookTester = () => {
             headers: myHeaders,
         };
 
-        fetch(`https://graph.facebook.com/v12.0/${userID}/permissions`, requestOptions)
+        fetch(`https://graph.facebook.com/v12.0/me/permissions`, requestOptions)
         .then(async response => {
             const result = await response.text();
             const log = `HTTP ${response.status}\n${result}`;

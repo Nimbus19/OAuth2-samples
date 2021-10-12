@@ -1,8 +1,9 @@
 import { Logger } from './modules/Logger.js'
-import { Auth0Tester } from './modules/Auth0Tester.js'
-import { BFFTester } from './modules/BFFTester.js'
-import { GoogleTester } from './modules/GoogleTester.js'
-import { FacebookTester } from './modules/FacebookTester.js'
+import { Auth0Tester } from './modules/test/Auth0Tester.js'
+import { BFFTester } from './modules/test/BFFTester.js'
+import { GoogleTester } from './modules/test/GoogleTester.js'
+import { FacebookTester } from './modules/test/FacebookTester.js'
+import { JavascriptTester } from './modules/test/JavascriptTester.js'
 
 // Global variables
 const logger = Logger();
@@ -10,6 +11,7 @@ const auth0Tester = Auth0Tester();
 const bffTester = BFFTester();
 const googleTester = GoogleTester();
 const facebookTester = FacebookTester();
+const jsTester = JavascriptTester();
 let appState = null;
 
 window.onload = () => {
@@ -30,6 +32,7 @@ const createTesterBtn = () => {
     createButton("Start BFF Test"   , ()=>{bffTester.init(logger, testArea)});
     createButton("Start Google Test", ()=>{googleTester.init(logger, testArea)});
     createButton("Start Facebook Test", ()=>{facebookTester.init(logger, testArea)});
+    createButton("Start JavaScript Test", ()=>{jsTester.init(logger, testArea)});
 }
 
 const createButton = (btnName, callback) => {
