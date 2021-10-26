@@ -97,13 +97,14 @@ export const FacebookTester = () => {
         }
         
         logger.add("Get auth code.", query.get("code"));
-        window.history.replaceState({}, document.title, "/");
+        // window.history.replaceState({}, document.title, "/");
 
         var myHeaders = new Headers();
         myHeaders.append("content-type", "application/x-www-form-urlencoded");
 
         var urlencoded = new URLSearchParams();
         urlencoded.append("client_id", config.client_id);
+        urlencoded.append("client_secret", getSecret());
         urlencoded.append("grant_type","authorization_code");
         urlencoded.append("code", query.get("code"));
         urlencoded.append("code_verifier", localStorage.getItem("pkce_code_verifier"));
@@ -156,7 +157,7 @@ export const FacebookTester = () => {
             }
         })
         .catch(error => logger.add("Get access token info error.", error, "red"));
-
+      
         fetch(`https://graph.facebook.com/v12.0/me/permissions`, requestOptions)
         .then(async response => {
             const result = await response.text();
@@ -170,6 +171,20 @@ export const FacebookTester = () => {
             }
         })
         .catch(error => logger.add("Get access token scope error.", error, "red"));  
+
+        fetch(`https://graph.facebook.com/me?access_token=${accessToken}`, requestOptions)
+        .then(async response => {
+            const result = await response.text();
+            const log = `HTTP ${response.status}\n${result}}`;
+
+            if(response.ok) {
+                logger.add("Get user info.", log);
+            }
+            else {
+                throw new Error(log);
+            }
+        })
+        .catch(error => logger.add("Get user info error.", error, "red"));
     }
 
     const getNewToken = async () => {

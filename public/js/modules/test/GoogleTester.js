@@ -12,7 +12,7 @@ export const GoogleTester = () => {
         testArea = HTMLDivElement;
         logger = Logger;
         var response = await fetch("../auth_config.json");
-        config = (await response.json()).google;
+        config = (await response.json()).google.web;
 
         addButtonsToTestArea();
     }
@@ -63,7 +63,7 @@ export const GoogleTester = () => {
         `&state=${state}` + 
         `&scope=openid profile email` + 
         `&response_type=code` + 
-        `&redirect_uri=http://localhost:3000/` +
+        `&redirect_uri=${config.redirect_uris[0]}/` +
         `&access_type=offline` +
         `&code_challenge_method=S256` + 
         `&code_challenge=${codeChallenge}`;
@@ -111,7 +111,7 @@ export const GoogleTester = () => {
         urlencoded.append("grant_type","authorization_code");
         urlencoded.append("code", query.get("code"));
         urlencoded.append("code_verifier", localStorage.getItem("pkce_code_verifier"));
-        urlencoded.append("redirect_uri", "http://localhost:3000/");
+        urlencoded.append("redirect_uri", config.redirect_uris[0] + "/");
 
         var requestOptions = {
             method: 'POST',
@@ -179,7 +179,7 @@ export const GoogleTester = () => {
         urlencoded.append("client_secret", getSecret());
         urlencoded.append("grant_type","refresh_token");
         urlencoded.append("refresh_token",refreshToken);
-        urlencoded.append("redirect_uri", "http://localhost:3000");
+        urlencoded.append("redirect_uri", config.redirect_uris[0] + "/");
 
         var requestOptions = {
             method: 'POST',
