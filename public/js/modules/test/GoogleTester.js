@@ -60,11 +60,12 @@ export const GoogleTester = () => {
 
         var authUrl = "https://accounts.google.com/o/oauth2/v2/auth" + 
         `?client_id=${config.client_id}` + 
-        `&state=${state}` + 
-        `&scope=openid profile email` + 
-        `&response_type=code` + 
         `&redirect_uri=${config.redirect_uris[0]}/` +
+        `&response_type=code` +         
+        `&scope=openid profile email` +       
         `&access_type=offline` +
+        `&state=${state}` + 
+        `&prompt=consent`+
         `&code_challenge_method=S256` + 
         `&code_challenge=${codeChallenge}`;
 
@@ -108,7 +109,7 @@ export const GoogleTester = () => {
         var urlencoded = new URLSearchParams();
         urlencoded.append("client_id", config.client_id);
         urlencoded.append("client_secret", getSecret());
-        urlencoded.append("grant_type","authorization_code");
+        urlencoded.append("grant_type", "authorization_code");
         urlencoded.append("code", query.get("code"));
         urlencoded.append("code_verifier", localStorage.getItem("pkce_code_verifier"));
         urlencoded.append("redirect_uri", config.redirect_uris[0] + "/");
@@ -177,7 +178,7 @@ export const GoogleTester = () => {
         var urlencoded = new URLSearchParams();
         urlencoded.append("client_id", config.client_id);
         urlencoded.append("client_secret", getSecret());
-        urlencoded.append("grant_type","refresh_token");
+        urlencoded.append("grant_type", "refresh_token");
         urlencoded.append("refresh_token",refreshToken);
         urlencoded.append("redirect_uri", config.redirect_uris[0] + "/");
 
