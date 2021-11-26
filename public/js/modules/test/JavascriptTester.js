@@ -25,6 +25,7 @@ export const JavascriptTester = () => {
         createButton("Closure", testClosure);
         createButton("Web Crypto API", testWebCrypto);
         createButton("Web Worker", testWebWorker);
+        createButton("Open redirector", testRedirector);
     }
 
     const testClosure = () => {
@@ -89,6 +90,14 @@ export const JavascriptTester = () => {
         else {
             console.log('Your browser doesn\'t support web workers.');
         }
+    }
+    
+    const testRedirector = () => {
+        var url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+        url +=  "/302?redirect=https://www.google.com/";
+        url += window.location.hash;
+        alert( "Redirect to \n" + url);
+        window.location.href = url;
     }
 
     return {
