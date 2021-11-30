@@ -24,3 +24,6 @@ jspm_packages/
 
 # Config of Auth server
 auth_config.json
+
+# SSL cert
+*.pem
