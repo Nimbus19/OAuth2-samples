@@ -1,16 +1,22 @@
 {
-  "auth0":
-  {
-    "domain": "dev-xxxx.us.auth0.com",
-    "clientId": "xxxxxxx",
+  "auth0": {
+    "domain": "*****.auth0.com",
+    "clientId": "*****",
     "audience": "http://localhost:3010"
   },
-  "google":
-  {
-    "client_id": "xxxxxxx.apps.googleusercontent.com"
+  "google": {
+    "web": {
+      "client_id": "*****.apps.googleusercontent.com",
+      "project_id": "OAuthNodejs",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "redirect_uris": [
+        "http://localhost:3000"
+      ]
+    }
   },
-    "facebook":
-  {
-    "client_id": "xxxxxxx"
+  "facebook": {
+    "client_id": "*****"
   }
 }

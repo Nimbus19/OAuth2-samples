@@ -46,8 +46,8 @@ export const Auth0Tester = () => {
                     domain: config.domain,
                     client_id: config.clientId,
                     audience: config.audience,
-                    cacheLocation: "localstorage",
-                    useRefreshTokens: true
+                    cacheLocation: "localstorage",                    
+                    useRefreshTokens: false
                 });
                 logger.add("Auth0 client created.");
             } catch (err) {
@@ -111,11 +111,12 @@ export const Auth0Tester = () => {
     const getToken = async () => {
         var option = {
             audience: 'http://localhost:3010',
+            scope: 'read:appointments',            
             ignoreCache: false
         }
 
         try {
-            accessToken = await auth0Client.getTokenSilently(option);
+            accessToken = await auth0Client.getTokenWithPopup(option);
             logger.add("Get access token.", accessToken);
         } catch (err) {
             logger.add("Get access token failed.", err);

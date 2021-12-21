@@ -32,32 +32,30 @@ export const JavascriptTester = () => {
     }
 
     const testClosure = () => {
-        function oauth() {
-            // private member
-            var accessToken = "";
-            var refresToken = "";
 
-            function runAuthFlow() {
-                accessToken = "AT1";
-                refresToken = "RT1";
+        function Closure() {
+            // private member
+            var secret = "My name is Jack";
+
+            function encrypt(text) {
+                return btoa(text);
             }
 
             // public member
             return {
-                init: function () {
-                    runAuthFlow();
-                },
-                getAT: function () {
-                    return accessToken;
+                get: function () {
+                    return encrypt(secret);
                 }
             };
         };
 
-        const client = oauth();
-        client.init();
-        console.log(client.getAT());// "AT1"
-        console.log(client.accessToken);// undefined
-        console.log(client.refresToken);// undefined
+        var closure = Closure();
+        console.log(closure.get());  // "TXkgbmFtZSBpcyBKYWNr"
+        console.log(closure.secret); // undefine
+
+        btoa = (x) => {return x;};
+        console.log(closure.get()); // "My name is Jack"
+
     }
 
     const testWebCrypto = () => {
@@ -83,10 +81,8 @@ export const JavascriptTester = () => {
     const testWebWorker = () => {
         if (window.Worker) {
             const myWorker = new Worker("js/modules/test/MyWorker.js");
-            console.log('Send message to worker');
-            myWorker.postMessage(["Hello ", "Worker!"]);
+            myWorker.postMessage("Hello Worker!");
             myWorker.onmessage = function (e) {
-                console.log('Message received from worker');
                 console.log(e.data);
             }
         }
