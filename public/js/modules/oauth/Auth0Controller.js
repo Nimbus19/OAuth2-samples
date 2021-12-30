@@ -1,4 +1,4 @@
-export const Auth0Tester = () => {
+export const Auth0Controller = () => {
     var testArea;
     var logger;
     var auth0Client;

@@ -1,4 +1,4 @@
-export const BFFTester = () => {
+export const BFFController = () => {
     var testArea;
     var logger;
     var csrfToken = "";

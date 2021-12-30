@@ -1,6 +1,6 @@
 import {StringUtility} from '../StringUtility.js'
 
-export const FacebookTester = () => {
+export const FacebookController = () => {
     var testArea;
     var logger;
     var config;

@@ -1,4 +1,4 @@
-export const JavascriptTester = () => {
+export const OtherTestController = () => {
     var testArea;
     var logger;
 
@@ -80,7 +80,7 @@ export const JavascriptTester = () => {
 
     const testWebWorker = () => {
         if (window.Worker) {
-            const myWorker = new Worker("js/modules/test/MyWorker.js");
+            const myWorker = new Worker("js/modules/oauth/MyWorker.js");
             myWorker.postMessage("Hello Worker!");
             myWorker.onmessage = function (e) {
                 console.log(e.data);

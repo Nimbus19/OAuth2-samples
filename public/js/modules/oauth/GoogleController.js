@@ -1,6 +1,6 @@
 import {StringUtility} from '../StringUtility.js'
 
-export const GoogleTester = () => {
+export const GoogleController = () => {
     var testArea;
     var logger;
     var config;
@@ -62,7 +62,7 @@ export const GoogleTester = () => {
         var authUrl = "https://accounts.google.com/o/oauth2/v2/auth" + 
         `?client_id=${config.client_id}` + 
         `&redirect_uri=${config.redirect_uris[0]}/` +
-        `&response_type=code` +         
+        `&response_type=code` +        
         `&scope=openid profile email` +       
         `&access_type=offline` +
         `&state=${state}` + 

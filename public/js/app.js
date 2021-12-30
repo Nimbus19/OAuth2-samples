@@ -1,17 +1,17 @@
 import { Logger } from './modules/Logger.js'
-import { Auth0Tester } from './modules/test/Auth0Tester.js'
-import { BFFTester } from './modules/test/BFFTester.js'
-import { GoogleTester } from './modules/test/GoogleTester.js'
-import { FacebookTester } from './modules/test/FacebookTester.js'
-import { JavascriptTester } from './modules/test/JavascriptTester.js'
+import { Auth0Controller } from './modules/oauth/Auth0Controller.js'
+import { BFFController } from './modules/oauth/BFFController.js'
+import { GoogleController } from './modules/oauth/GoogleController.js'
+import { FacebookController } from './modules/oauth/FacebookController.js'
+import { OtherTestController } from './modules/oauth/OtherTestController.js'
 
 // Global variables
 const logger = Logger();
-const auth0Tester = Auth0Tester();
-const bffTester = BFFTester();
-const googleTester = GoogleTester();
-const facebookTester = FacebookTester();
-const jsTester = JavascriptTester();
+const auth0 = Auth0Controller();
+const bff = BFFController();
+const google = GoogleController();
+const facebook = FacebookController();
+const otherTest = OtherTestController();
 let appState = null;
 
 window.onload = () => {
@@ -28,11 +28,11 @@ const createLogger = () => {
 
 const createTesterBtn = () => {
     var testArea = document.getElementById("div-test-area");
-    createButton("Start Auth0 Test" , ()=>{auth0Tester.init(logger, testArea)});
-    createButton("Start BFF Test"   , ()=>{bffTester.init(logger, testArea)});
-    createButton("Start Google Test", ()=>{googleTester.init(logger, testArea)});
-    createButton("Start Facebook Test", ()=>{facebookTester.init(logger, testArea)});
-    createButton("Start JavaScript Test", ()=>{jsTester.init(logger, testArea)});
+    createButton("Start Auth0 Test" , ()=>{auth0.init(logger, testArea)});
+    createButton("Start BFF Test"   , ()=>{bff.init(logger, testArea)});
+    createButton("Start Google Test", ()=>{google.init(logger, testArea)});
+    createButton("Start Facebook Test", ()=>{facebook.init(logger, testArea)});
+    createButton("Start JavaScript Test", ()=>{otherTest.init(logger, testArea)});
 }
 
 const createButton = (btnName, callback) => {
